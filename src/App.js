@@ -3,6 +3,9 @@ import './App.css';
 import Logo from './components/Logo';
 import Search from './components/Search';
 import Card from './components/Card';
+import Tilt from 'react-tilt';
+
+const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 
 class App extends Component {
   constructor(props) {
@@ -14,7 +17,6 @@ class App extends Component {
       typing: '',
       image: '',
       status: 'wait',
-      api: '04a4336902f247d8cb2f967b426f2481',
     };
   }
   input = (event) => {
@@ -23,9 +25,10 @@ class App extends Component {
   faren = (numb) => {
     return Math.round(((numb - 273.15) * 9) / 5 + 32);
   };
-  press = () => {
+  press = (event) => {
+    event.preventDefault();
     fetch(
-      `http://api.openweathermap.org/data/2.5/weather?id=524901&appid=${this.state.api}&zip=${this.state.typing}`
+      `http://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&zip=${this.state.typing}`
     )
       .then((res) => res.json())
       .then((city) => {
@@ -51,7 +54,13 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Logo />
+        <Tilt
+          className="Tilt"
+          options={{ max: 25 }}
+          style={{ height: 0, width: 90 }}
+        >
+          <Logo />
+        </Tilt>
         <h1 className="f-subheadline pt0 "> Weather</h1>
         <Search className="ma3" input={this.input} press={this.press} />
         {(() => {
@@ -73,6 +82,8 @@ class App extends Component {
               );
             case 'wait':
               return '';
+            default:
+              return <h2>Loading...</h2>;
           }
         })()}
       </div>
